@@ -1,0 +1,121 @@
+playervar define menuItems;
+playervar define menuItemPositions;
+playervar define menuCenter;
+playervar define menuItemIDs;
+playervar define menuAnimationScale;
+playervar define i;
+
+define menuDistanceFromPlayer: 2;
+define menuItemIconSize: 2.5;
+define menuCenterOffset: Vector(0,-0.150,0);
+define menuAnimationTime: 0.2;
+
+rule: "Init Player"
+Event.OngoingPlayer
+{
+    updateMenu()
+}
+
+rule: "Open Menu"
+Event.OngoingPlayer
+if(IsButtonHeld(EventPlayer(), Button.Interact))
+if(menuAnimationScale == 0)
+{
+    menuCenter = menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
+    ChaseVariableOverTime(menuAnimationScale, 1, menuAnimationTime, TimeChaseReevaluation.None)
+}
+
+rule: "Close Menu"
+Event.OngoingPlayer
+if(!IsButtonHeld(EventPlayer(), Button.Interact))
+if(menuAnimationScale > 0)
+{
+    ChaseVariableOverTime(menuAnimationScale, 0, menuAnimationTime, TimeChaseReevaluation.None)
+}
+
+void updateMenu() "Update Menu" {
+    updateMenuItemPositions()
+    updateMenuItemIcons() 
+}
+
+void updateMenuItemPositions() {
+    menuItems = AllowedHeroes() // TODO Init menu items with tanks, supports and damage heroes
+    menuItemPositions = []
+    if(CountOf(AllowedHeroes()) <= 2) {
+        menuItemPositions = [Left(), Right()]
+    } else {
+        for(i=0; CountOf(AllowedHeroes()); 1) {
+            menuItemPositions[i] = Vector(
+                SineFromDegrees((360/CountOf(AllowedHeroes())) * i),
+                CosineFromDegrees((360/CountOf(AllowedHeroes())) * i),
+                0
+            )
+        }
+    }
+}
+
+void updateMenuItemIcons() {
+    destroyMenuItems()
+    menuItemIDs = []
+    for(i=0; CountOf(menuItems); 1) {
+        // Create InWorldText
+        if(i==0) createMenuItem(0)
+        else if(i==1) createMenuItem(1)
+        else if(i==2) createMenuItem(2)
+        else if(i==3) createMenuItem(3)
+        else if(i==4) createMenuItem(4)
+        else if(i==5) createMenuItem(5)
+        else if(i==6) createMenuItem(6)
+        else if(i==7) createMenuItem(7)
+        else if(i==8) createMenuItem(8)
+        else if(i==9) createMenuItem(9)
+        else if(i==10) createMenuItem(10)
+        else if(i==11) createMenuItem(11)
+        else if(i==12) createMenuItem(12)
+        else if(i==13) createMenuItem(13)
+        else if(i==14) createMenuItem(14)
+        else if(i==15) createMenuItem(15)
+        else if(i==16) createMenuItem(16)
+        else if(i==17) createMenuItem(17)
+        else if(i==18) createMenuItem(18)
+        else if(i==19) createMenuItem(19)
+        else if(i==20) createMenuItem(20)
+        else if(i==21) createMenuItem(21)
+        else if(i==22) createMenuItem(22)
+        else if(i==23) createMenuItem(23)
+        else if(i==24) createMenuItem(24)
+        else if(i==25) createMenuItem(25)
+        else if(i==26) createMenuItem(26)
+        else if(i==27) createMenuItem(27)
+        else if(i==28) createMenuItem(28)
+        else if(i==29) createMenuItem(29)
+        else if(i==30) createMenuItem(30)
+
+        // Store the InWorldText ID
+        menuItemIDs = Append(menuItemIDs, LastTextID())
+    }
+}
+
+void destroyMenuItems() {
+    for(i=0; CountOf(menuItemIDs); 1) {
+        DestroyInWorldText(menuItemIDs[i])
+    }
+}
+
+void createMenuItem(ref define idx) {
+    CreateInWorldText(
+        FilteredArray(EventPlayer(), menuAnimationScale >= 0.1),
+        HeroIconString(menuItems[idx]),
+        WorldVectorOf(
+            LocalVectorOf(menuCenter + EyePosition()) + menuItemPositions[idx] * menuAnimationScale,
+            EventPlayer()
+        ),
+        menuItemIconSize,
+        Clipping.DoNotClip
+    )
+}
+
+/* Returns a number whose value is limited to the given range */
+define clamp(ref define val, ref define min, ref define max) {
+    return Min(max,Max(min,val));
+}
