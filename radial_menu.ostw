@@ -3,12 +3,13 @@ playervar define menuItemPositions;
 playervar define menuCenter;
 playervar define menuItemIDs;
 playervar define menuAnimationScale;
-playervar define i;
+playervar define tmp;
 
 define menuDistanceFromPlayer: 2;
 define menuItemIconSize: 2.5;
-define menuCenterOffset: Vector(0,-0.150,0);
 define menuAnimationTime: 0.2;
+define halfIconHeight: Vector(0,0.150,0);
+define selectionSensitivity: 0.5;
 
 rule: "Init Player"
 Event.OngoingPlayer
@@ -21,7 +22,7 @@ Event.OngoingPlayer
 if(IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuAnimationScale == 0)
 {
-    menuCenter = menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
+    menuCenter = menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
     ChaseVariableOverTime(menuAnimationScale, 1, menuAnimationTime, TimeChaseReevaluation.None)
 }
 
@@ -31,6 +32,19 @@ if(!IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuAnimationScale > 0)
 {
     ChaseVariableOverTime(menuAnimationScale, 0, menuAnimationTime, TimeChaseReevaluation.None)
+}
+
+rule: "Select Menu Item"
+Event.OngoingPlayer
+if(!IsButtonHeld(EventPlayer(), Button.Interact))
+if(menuAnimationScale == 1)
+{
+    tmp = getIndexOfSelectedMenuItem()
+    SmallMessage(EventPlayer(), tmp)
+    if(tmp >= 0) {
+        ForcePlayerHero(EventPlayer(), ValueInArray(AllowedHeroes(), tmp))
+        StopForcingHero()
+    }
 }
 
 void updateMenu() "Update Menu" {
@@ -44,10 +58,10 @@ void updateMenuItemPositions() {
     if(CountOf(AllowedHeroes()) <= 2) {
         menuItemPositions = [Left(), Right()]
     } else {
-        for(i=0; CountOf(AllowedHeroes()); 1) {
-            menuItemPositions[i] = Vector(
-                SineFromDegrees((360/CountOf(AllowedHeroes())) * i),
-                CosineFromDegrees((360/CountOf(AllowedHeroes())) * i),
+        for(tmp=0; CountOf(AllowedHeroes()); 1) {
+            menuItemPositions[tmp] = Vector(
+                SineFromDegrees((360/CountOf(AllowedHeroes())) * tmp),
+                CosineFromDegrees((360/CountOf(AllowedHeroes())) * tmp),
                 0
             )
         }
@@ -57,39 +71,39 @@ void updateMenuItemPositions() {
 void updateMenuItemIcons() {
     destroyMenuItems()
     menuItemIDs = []
-    for(i=0; CountOf(menuItems); 1) {
+    for(tmp=0; CountOf(menuItems); 1) {
         // Create InWorldText
-        if(i==0) createMenuItem(0)
-        else if(i==1) createMenuItem(1)
-        else if(i==2) createMenuItem(2)
-        else if(i==3) createMenuItem(3)
-        else if(i==4) createMenuItem(4)
-        else if(i==5) createMenuItem(5)
-        else if(i==6) createMenuItem(6)
-        else if(i==7) createMenuItem(7)
-        else if(i==8) createMenuItem(8)
-        else if(i==9) createMenuItem(9)
-        else if(i==10) createMenuItem(10)
-        else if(i==11) createMenuItem(11)
-        else if(i==12) createMenuItem(12)
-        else if(i==13) createMenuItem(13)
-        else if(i==14) createMenuItem(14)
-        else if(i==15) createMenuItem(15)
-        else if(i==16) createMenuItem(16)
-        else if(i==17) createMenuItem(17)
-        else if(i==18) createMenuItem(18)
-        else if(i==19) createMenuItem(19)
-        else if(i==20) createMenuItem(20)
-        else if(i==21) createMenuItem(21)
-        else if(i==22) createMenuItem(22)
-        else if(i==23) createMenuItem(23)
-        else if(i==24) createMenuItem(24)
-        else if(i==25) createMenuItem(25)
-        else if(i==26) createMenuItem(26)
-        else if(i==27) createMenuItem(27)
-        else if(i==28) createMenuItem(28)
-        else if(i==29) createMenuItem(29)
-        else if(i==30) createMenuItem(30)
+        if(tmp==0) createMenuItem(0)
+        else if(tmp==1) createMenuItem(1)
+        else if(tmp==2) createMenuItem(2)
+        else if(tmp==3) createMenuItem(3)
+        else if(tmp==4) createMenuItem(4)
+        else if(tmp==5) createMenuItem(5)
+        else if(tmp==6) createMenuItem(6)
+        else if(tmp==7) createMenuItem(7)
+        else if(tmp==8) createMenuItem(8)
+        else if(tmp==9) createMenuItem(9)
+        else if(tmp==10) createMenuItem(10)
+        else if(tmp==11) createMenuItem(11)
+        else if(tmp==12) createMenuItem(12)
+        else if(tmp==13) createMenuItem(13)
+        else if(tmp==14) createMenuItem(14)
+        else if(tmp==15) createMenuItem(15)
+        else if(tmp==16) createMenuItem(16)
+        else if(tmp==17) createMenuItem(17)
+        else if(tmp==18) createMenuItem(18)
+        else if(tmp==19) createMenuItem(19)
+        else if(tmp==20) createMenuItem(20)
+        else if(tmp==21) createMenuItem(21)
+        else if(tmp==22) createMenuItem(22)
+        else if(tmp==23) createMenuItem(23)
+        else if(tmp==24) createMenuItem(24)
+        else if(tmp==25) createMenuItem(25)
+        else if(tmp==26) createMenuItem(26)
+        else if(tmp==27) createMenuItem(27)
+        else if(tmp==28) createMenuItem(28)
+        else if(tmp==29) createMenuItem(29)
+        else if(tmp==30) createMenuItem(30)
 
         // Store the InWorldText ID
         menuItemIDs = Append(menuItemIDs, LastTextID())
@@ -97,8 +111,8 @@ void updateMenuItemIcons() {
 }
 
 void destroyMenuItems() {
-    for(i=0; CountOf(menuItemIDs); 1) {
-        DestroyInWorldText(menuItemIDs[i])
+    for(tmp=0; CountOf(menuItemIDs); 1) {
+        DestroyInWorldText(menuItemIDs[tmp])
     }
 }
 
@@ -107,12 +121,37 @@ void createMenuItem(ref define idx) {
         FilteredArray(EventPlayer(), menuAnimationScale >= 0.1),
         HeroIconString(menuItems[idx]),
         WorldVectorOf(
-            LocalVectorOf(menuCenter + EyePosition()) + menuItemPositions[idx] * menuAnimationScale,
+            LocalVectorOf(EyePosition() + menuCenter) + menuItemPositions[idx] * menuAnimationScale,
             EventPlayer()
         ),
         menuItemIconSize,
         Clipping.DoNotClip
     )
+}
+
+define getIndexOfSelectedMenuItem() {
+    return IndexOfArrayValue(
+        menuItemPositions,
+        FirstOf(
+            getMenuItemPositionsNearMouse(selectionSensitivity)
+        )
+    );
+}
+
+define getMenuItemPositionsNearMouse(ref define radius) {
+    return FilteredArray(
+        menuItemPositions,
+        AngleBetweenVectors(
+            FacingDirectionOf(), 
+            DirectionTowards(
+                EyePosition(),
+                WorldVectorOf(
+                    LocalVectorOf(EyePosition() + menuCenter + halfIconHeight) + ArrayElement(),
+                    EventPlayer()
+                ),
+            )
+        ) < radius
+    );
 }
 
 /* Returns a number whose value is limited to the given range */
