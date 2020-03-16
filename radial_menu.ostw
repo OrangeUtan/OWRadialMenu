@@ -1,15 +1,16 @@
 playervar define menuItems;
-playervar define menuItemPositions;
-playervar define menuCenter;
-playervar define menuItemIDs;
+playervar define menuCenter; // The center of the menu relative to the player
+playervar define menuItemPositions; // The positions of the menu items relative to the menu center
+playervar define menuItemIDs; // The InWorldText IDs of the menu items
 playervar define menuAnimationScale;
+playervar define menuVisibleTo;
 playervar define tmp;
 
-define menuDistanceFromPlayer: 2;
-define menuItemIconSize: 2.5;
-define menuAnimationTime: 0.2;
-define halfIconHeight: Vector(0,0.150,0);
-define selectionSensitivity: 0.5;
+define menuDistanceFromPlayer: 2; // z-distance of the menu to the players eyes
+define menuItemIconScale: 2.5; // Scale of the menu items
+define halfIconHeight: Vector(0,0.150,0); // A rough estimate of half the height of menu items
+define menuAnimationTime: 0.2; // The time in which the menu is animated open/closed
+define selectionRadius: 0.5; // Radius around menu items where they can be selected
 
 rule: "Init Player"
 Event.OngoingPlayer
@@ -22,6 +23,7 @@ Event.OngoingPlayer
 if(IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuAnimationScale == 0)
 {
+    menuVisibleTo = EventPlayer()
     menuCenter = menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
     ChaseVariableOverTime(menuAnimationScale, 1, menuAnimationTime, TimeChaseReevaluation.None)
 }
@@ -32,6 +34,8 @@ if(!IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuAnimationScale > 0)
 {
     ChaseVariableOverTime(menuAnimationScale, 0, menuAnimationTime, TimeChaseReevaluation.None)
+    Wait(menuAnimationTime * 0.8)
+    menuVisibleTo = []
 }
 
 rule: "Select Menu Item"
@@ -118,13 +122,13 @@ void destroyMenuItems() {
 
 void createMenuItem(ref define idx) {
     CreateInWorldText(
-        FilteredArray(EventPlayer(), menuAnimationScale >= 0.1),
+        menuVisibleTo,
         HeroIconString(menuItems[idx]),
         WorldVectorOf(
             LocalVectorOf(EyePosition() + menuCenter) + menuItemPositions[idx] * menuAnimationScale,
             EventPlayer()
         ),
-        menuItemIconSize,
+        menuItemIconScale,
         Clipping.DoNotClip
     )
 }
@@ -133,7 +137,7 @@ define getIndexOfSelectedMenuItem() {
     return IndexOfArrayValue(
         menuItemPositions,
         FirstOf(
-            getMenuItemPositionsNearMouse(selectionSensitivity)
+            getMenuItemPositionsNearMouse(selectionRadius)
         )
     );
 }
