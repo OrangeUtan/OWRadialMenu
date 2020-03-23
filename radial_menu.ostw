@@ -87,7 +87,12 @@ Event.OngoingPlayer
 if(!IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuIsOpen)
 {
-    tmp = getIndexOfSelectedMenuItem()
+    
+    if(HeroOf() == Hero.Winston) tmp = -2*menuCenterOffset
+    else tmp = -menuCenterOffset
+    
+    tmp = getIndexOfSelectedMenuItem(tmp)
+    
     if(tmp >= 0) {
         ForcePlayerHero(EventPlayer(), ValueInArray(menuItems, tmp))
         StopForcingHero()
@@ -186,16 +191,16 @@ void createMenuItem(ref define idx) {
     )
 }
 
-define getIndexOfSelectedMenuItem() {
+define getIndexOfSelectedMenuItem(ref define reticleOffset) {
     return IndexOfArrayValue(
         menuItemPositions,
         FirstOf(
-            getMenuItemPositionsNearMouse(selectionRadius)
+            getMenuItemPositionsNearMouse(selectionRadius, reticleOffset)
         )
     );
 }
 
-define getMenuItemPositionsNearMouse(ref define radius) {
+define getMenuItemPositionsNearMouse(ref define radius, ref define reticleOffset) {
     return FilteredArray(
         menuItemPositions,
         AngleBetweenVectors(
@@ -203,7 +208,7 @@ define getMenuItemPositionsNearMouse(ref define radius) {
             DirectionTowards(
                 EyePosition(),
                 WorldVectorOf(
-                    LocalVectorOf(EyePosition() + menuCenter - menuCenterOffset) + ArrayElement() * menuScale,
+                    LocalVectorOf(EyePosition() + menuCenter + reticleOffset) + ArrayElement() * menuScale,
                     EventPlayer()
                 ),
             )
