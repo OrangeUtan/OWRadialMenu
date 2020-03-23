@@ -54,11 +54,11 @@ if(menuScale == maxMenuScale)
 }
 
 void updateMenu() "Update Menu" {
-    updateMenuItemPositions()
-    updateMenuItemIcons() 
+    updateMenuItems()
+    updateMenuGUI()
 }
 
-void updateMenuItemPositions() {
+void updateMenuItems() {
     menuItems = FilteredArray([AllSupportHeroes(), AllTankHeroes(), AllDamageHeroes()], ArrayContains(AllowedHeroes(), ArrayElement()))
     menuItemPositions = []
     if(CountOf(menuItems) <= 2) {
@@ -74,9 +74,8 @@ void updateMenuItemPositions() {
     }
 }
 
-void updateMenuItemIcons() {
-    destroyMenuItems()
-    menuItemIDs = []
+void updateMenuGUI() {
+    clearMenuGUI()
 
     tmp = LastTextID() + 1
 
@@ -120,10 +119,11 @@ void updateMenuItemIcons() {
     }
 }
 
-void destroyMenuItems() {
+void clearMenuGUI() {
     for(tmp=0; CountOf(menuItemIDs); 1) {
         DestroyInWorldText(menuItemIDs[tmp])
     }
+    menuItemIDs = []
 }
 
 void createMenuItem(ref define idx) {
