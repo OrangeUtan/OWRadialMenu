@@ -13,7 +13,7 @@ define menuItemIconScale: 2.5; // Scale of the menu items
 define menuCenterOffset: Vector(0,-0.150,0);
 define menuAnimationTime: 0.2; // The time in which the menu is animated open/closed
 define selectionRadius: 0.5; // Radius around menu items where they can be selected
-define maxMenuScale: 0.2 + CountOf(AllowedHeroes()) * 0.03;
+define maxMenuScale: 0.2 + CountOf(menuItems) * 0.03;
 
 rule: "Init Player"
 Event.OngoingPlayer
@@ -48,7 +48,7 @@ if(menuScale == maxMenuScale)
 {
     tmp = getIndexOfSelectedMenuItem()
     if(tmp >= 0) {
-        ForcePlayerHero(EventPlayer(), ValueInArray(AllowedHeroes(), tmp))
+        ForcePlayerHero(EventPlayer(), ValueInArray(menuItems, tmp))
         StopForcingHero()
     }
 }
@@ -59,15 +59,15 @@ void updateMenu() "Update Menu" {
 }
 
 void updateMenuItemPositions() {
-    menuItems = AllowedHeroes() // TODO Init menu items with tanks, supports and damage heroes
+    menuItems = FilteredArray([AllSupportHeroes(), AllTankHeroes(), AllDamageHeroes()], ArrayContains(AllowedHeroes(), ArrayElement()))
     menuItemPositions = []
-    if(CountOf(AllowedHeroes()) <= 2) {
+    if(CountOf(menuItems) <= 2) {
         menuItemPositions = [Left(), Right()]
     } else {
-        for(tmp=0; CountOf(AllowedHeroes()); 1) {
+        for(tmp=0; CountOf(menuItems); 1) {
             menuItemPositions[tmp] = Vector(
-                SineFromDegrees((360/CountOf(AllowedHeroes())) * tmp),
-                CosineFromDegrees((360/CountOf(AllowedHeroes())) * tmp),
+                SineFromDegrees((360/CountOf(menuItems)) * tmp),
+                CosineFromDegrees((360/CountOf(menuItems)) * tmp),
                 0
             )
         }
@@ -81,7 +81,7 @@ void updateMenuItemIcons() {
     tmp = LastTextID() + 1
 
     // Create InWorldText
-    Skip(30 - CountOf(AllowedHeroes()))
+    Skip(30 - CountOf(menuItems))
     createMenuItem(30)
     createMenuItem(29)
     createMenuItem(28)
