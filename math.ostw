@@ -1,0 +1,12 @@
+/* Shortcut for 'RoundToInteger' */
+define round(ref define val, Rounding rounding): RoundToInteger(val, rounding);
+define roundDown(ref define val): RoundToInteger(val, Rounding.Down);
+define roundUp(ref define val): RoundToInteger(val, Rounding.Up);
+
+/* Returns a number whose value is limited to the given range */
+define clamp(ref define val, ref define min, ref define max) {
+    return Min(max,Max(min,val));
+}
+
+define isInRange(ref define val, ref define min, ref define max): val >= min && val <= max;
+define isOutsideRange(ref define val, ref define min, ref define max): val < min || val > max;

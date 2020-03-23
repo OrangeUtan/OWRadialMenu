@@ -1,3 +1,5 @@
+import "math.ostw";
+
 playervar define menuItems;
 playervar define menuCenter; // The center of the menu relative to the player
 playervar define menuItemPositions; // The positions of the menu items relative to the menu center
@@ -160,9 +162,4 @@ define getMenuItemPositionsNearMouse(ref define radius) {
             )
         ) < radius
     );
-}
-
-/* Returns a number whose value is limited to the given range */
-define clamp(ref define val, ref define min, ref define max) {
-    return Min(max,Max(min,val));
 }
