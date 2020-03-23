@@ -94,6 +94,12 @@ if(menuIsOpen)
     }
 }
 
+rule: "Player leaves"
+Event.OnPlayerLeave
+{
+    clearMenuGUI()
+}
+
 void updateMenu() "Update Menu" {
     updateMenuItems()
     updateMenuGUI()
