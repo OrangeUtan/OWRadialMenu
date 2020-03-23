@@ -5,7 +5,8 @@ playervar define menuCenter; // The center of the menu relative to the player
 playervar define menuItemPositions; // The positions of the menu items relative to the menu center
 playervar define menuItemIDs; // The InWorldText IDs of the menu items
 playervar define menuScale;
-playervar define menuVisibleTo;
+playervar define menuVisibleTo; // Helper variable to make menu invisible
+playervar define angleFromMenuCenter; // Angle between reticle and menuCenter
 playervar define tmp; // Temporary variable. Don't rely on its content!!!
 
 define menuDistanceFromPlayer: 2; // z-distance of the menu to the players eyes
@@ -23,6 +24,18 @@ define menuIsOpen: menuScale == maxMenuScale;
 rule: "Init Player"
 Event.OngoingPlayer
 {
+    ChaseVariableAtRate(
+        angleFromMenuCenter, 
+        HorizontalAngleTowards(
+            EventPlayer(),
+            WorldVectorOf(
+                LocalVectorOf(EyePosition() + menuCenter - menuCenterOffset),
+                EventPlayer()
+            ),
+        ),
+        360,
+        RateChaseReevaluation.DestinationAndRate
+    )
     updateMenu()
 }
 
@@ -44,6 +57,29 @@ if(menuIsOpening)
     ChaseVariableOverTime(menuScale, 0, menuAnimationTime, TimeChaseReevaluation.None)
     Wait(menuAnimationTime * 0.8)
     menuVisibleTo = []
+}
+
+rule: "Let menu follow reticle"
+Event.OngoingPlayer
+if(menuIsOpen)
+if(AbsoluteValue(angleFromMenuCenter) > (30 * (menuScale + 0.5)))
+{
+    ChaseVariableOverTime(
+        menuCenter,
+        menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(
+            HorizontalFacingAngleOf(EventPlayer()) + (angleFromMenuCenter/AbsoluteValue(angleFromMenuCenter))*28,
+            clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40)
+        ),
+        0.1,
+        TimeChaseReevaluation.DestinationAndDuration
+    )
+}
+
+rule: "Stop menu following reticle"
+Event.OngoingPlayer
+if(AbsoluteValue(angleFromMenuCenter) < (30 * (menuScale + 0.5)))
+{
+    StopChasingVariable(menuCenter)
 }
 
 rule: "Select Menu Item"
