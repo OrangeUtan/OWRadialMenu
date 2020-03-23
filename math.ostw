@@ -10,3 +10,6 @@ define clamp(ref define val, ref define min, ref define max) {
 
 define isInRange(ref define val, ref define min, ref define max): val >= min && val <= max;
 define isOutsideRange(ref define val, ref define min, ref define max): val < min || val > max;
+
+/** Returns the sign of a number **/
+define sign(ref define num): num/AbsoluteValue(num);

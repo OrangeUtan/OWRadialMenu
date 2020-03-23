@@ -67,7 +67,7 @@ if(AbsoluteValue(angleFromMenuCenter) > (30 * (menuScale + 0.5)))
     ChaseVariableOverTime(
         menuCenter,
         menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(
-            HorizontalFacingAngleOf(EventPlayer()) + (angleFromMenuCenter/AbsoluteValue(angleFromMenuCenter))*28,
+            HorizontalFacingAngleOf(EventPlayer()) + sign(angleFromMenuCenter)*28,
             clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40)
         ),
         0.1,
