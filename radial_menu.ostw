@@ -105,6 +105,13 @@ Event.OnPlayerLeave
     clearMenuGUI()
 }
 
+rule: "Update menu if number of allowed heroes change"
+Event.OngoingPlayer
+if(CountOf(menuItems) != CountOf(AllowedHeroes()))
+{
+    updateMenu()
+}
+
 void updateMenu() "Update Menu" {
     updateMenuItems()
     updateMenuGUI()
