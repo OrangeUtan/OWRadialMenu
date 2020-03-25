@@ -12,7 +12,7 @@ playervar define tmp; // Temporary variable. Don't rely on its content!!!
 define menuDistanceFromPlayer: 2; // z-distance of the menu to the players eyes
 define menuItemIconScale: 2.5; // Scale of the menu items
 define menuCenterOffset: Vector(0,-0.150,0);
-define menuAnimationTime: 0.2; // The time in which the menu is animated open/closed
+define menuAnimationTime: 0.15; // The time in which the menu is animated open/closed
 define selectionRadius: 0.5; // Radius around menu items where they can be selected
 define maxMenuScale: 0.2 + CountOf(menuItems) * 0.03;
 
@@ -46,7 +46,7 @@ if(menuIsClosed)
 {
     menuVisibleTo = EventPlayer()
     menuCenter = menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
-    ChaseVariableOverTime(menuScale, maxMenuScale, menuAnimationTime, TimeChaseReevaluation.None)
+    ChaseVariableOverTime(menuScale, maxMenuScale, menuAnimationTime, TimeChaseReevaluation.DestinationAndDuration)
 }
 
 rule: "Close Menu"
@@ -54,7 +54,7 @@ Event.OngoingPlayer
 if(!IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuIsOpening)
 {
-    ChaseVariableOverTime(menuScale, 0, menuAnimationTime, TimeChaseReevaluation.None)
+    ChaseVariableOverTime(menuScale, 0, menuAnimationTime, TimeChaseReevaluation.DestinationAndDuration)
     Wait(menuAnimationTime * 0.8)
     menuVisibleTo = []
 }
@@ -115,6 +115,7 @@ if(CountOf(menuItems) != CountOf(AllowedHeroes()))
 void updateMenu() "Update Menu" {
     updateMenuItems()
     updateMenuGUI()
+    menuScale = maxMenuScale
 }
 
 void updateMenuItems() {
