@@ -1,4 +1,5 @@
 import "math.ostw";
+import "overwatch.ostw";
 
 playervar define menuItems;
 playervar define menuCenter; // The center of the menu relative to the player
@@ -11,7 +12,6 @@ playervar define tmp; // Temporary variable. Don't rely on its content!!!
 
 define menuDistanceFromPlayer: 2; // z-distance of the menu to the players eyes
 define menuItemIconScale: 2.5; // Scale of the menu items
-define menuCenterOffset: Vector(0,-0.150,0);
 define menuAnimationTime: 0.15; // The time in which the menu is animated open/closed
 define selectionRadius: 0.5; // Radius around menu items where they can be selected
 define maxMenuScale: 0.2 + CountOf(menuItems) * 0.03;
@@ -29,7 +29,7 @@ Event.OngoingPlayer
         HorizontalAngleTowards(
             EventPlayer(),
             WorldVectorOf(
-                LocalVectorOf(EyePosition() + menuCenter - menuCenterOffset),
+                LocalVectorOf(EyePosition() + OFFSET_EYES_FROM_RETICLE + menuCenter),
                 EventPlayer()
             ),
         ),
@@ -45,7 +45,7 @@ if(IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuIsClosed)
 {
     menuVisibleTo = EventPlayer()
-    menuCenter = menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
+    menuCenter = -OFFSET_EYES_FROM_RETICLE + menuDistanceFromPlayer * DirectionFromAngles(HorizontalFacingAngleOf(EventPlayer()), clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40))
     ChaseVariableOverTime(menuScale, maxMenuScale, menuAnimationTime, TimeChaseReevaluation.DestinationAndDuration)
 }
 
@@ -66,7 +66,7 @@ if(AbsoluteValue(angleFromMenuCenter) > (30 * (menuScale + 0.5)))
 {
     ChaseVariableOverTime(
         menuCenter,
-        menuCenterOffset + menuDistanceFromPlayer * DirectionFromAngles(
+        -OFFSET_EYES_FROM_RETICLE + menuDistanceFromPlayer * DirectionFromAngles(
             HorizontalFacingAngleOf(EventPlayer()) + sign(angleFromMenuCenter)*28,
             clamp(VerticalFacingAngleOf(EventPlayer()), -40, 40)
         ),
@@ -88,8 +88,8 @@ if(!IsButtonHeld(EventPlayer(), Button.Interact))
 if(menuIsOpen)
 {
     
-    if(HeroOf() == Hero.Winston) tmp = -2*menuCenterOffset
-    else tmp = -menuCenterOffset
+    if(HeroOf() == Hero.Winston) tmp = 2*OFFSET_EYES_FROM_RETICLE
+    else tmp = OFFSET_EYES_FROM_RETICLE
     
     tmp = getIndexOfSelectedMenuItem(tmp)
     
@@ -140,7 +140,7 @@ void updateMenuGUI() {
     tmp = LastTextID() + 1
 
     // Create InWorldText
-    Skip(30 - CountOf(menuItems))
+    Skip(NUM_HEROES - CountOf(menuItems))
     createMenuItem(30)
     createMenuItem(29)
     createMenuItem(28)

@@ -1,0 +1,7 @@
+/**
+    Contants, macros etc related purely to the game.
+**/
+
+
+define NUM_HEROES: 31; // Number of current Heroes in the game
+define OFFSET_EYES_FROM_RETICLE: Vector(0,0.150,0); // The offset of the eyes position from the reticle. Winston has double the offset
