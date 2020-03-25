@@ -174,7 +174,7 @@ void updateMenuGUI() {
     createMenuItem(0)
 
     // Save IDs of successfully created InWorldTexts (no ID is created by OW if creation fails)
-    for(tmp=tmp; LastTextID(); 1) {
+    for(tmp=tmp; LastTextID() + 1; 1) {
          menuItemIDs = Append(menuItemIDs, tmp)
     }
 }
